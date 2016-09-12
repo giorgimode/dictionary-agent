@@ -1,10 +1,9 @@
 package com.giorgimode.dictionary.api;
 
+import com.giorgimode.dictionary.impl.WordnetService;
 import org.junit.Test;
 
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by modeg on 9/11/2016.

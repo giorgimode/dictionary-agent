@@ -34,7 +34,7 @@ public class Tester {
 
           // construct the URL to the Wordnet dictionary directory
           //    String wnhome = System . getenv (" WNHOME ") ;
-          String path = ".\\src\\main\\resources\\wordnet\\dict";
+          String path = ".\\src\\test\\resources\\wordnet_3.0.0\\wordnet.dict";
           URL url = new URL("file", null, path);
 
           // construct the dictionary object and open it

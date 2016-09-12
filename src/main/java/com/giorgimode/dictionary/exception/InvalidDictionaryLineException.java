@@ -2,15 +2,13 @@ package com.giorgimode.dictionary.exception;
 
 /**
  * An exception for an invalid dictionary format.
- * 
- *
  */
 public class InvalidDictionaryLineException extends DictionaryException {
     private static final long serialVersionUID = 1L;
 
     /**
      * @param message the exception message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public InvalidDictionaryLineException(String message, Throwable cause) {
         super(message, cause);

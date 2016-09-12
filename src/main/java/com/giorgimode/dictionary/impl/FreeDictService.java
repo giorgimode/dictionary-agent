@@ -1,4 +1,6 @@
-package com.giorgimode.dictionary.api;
+package com.giorgimode.dictionary.impl;
+
+import com.giorgimode.dictionary.api.DictionaryService;
 
 import java.util.Map;
 

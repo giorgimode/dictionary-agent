@@ -1,5 +1,6 @@
-package com.giorgimode.dictionary.api;
+package com.giorgimode.dictionary.impl;
 
+import com.giorgimode.dictionary.api.DictionaryService;
 import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.exception.DictionaryReaderException;
 import edu.mit.jwi.Dictionary;
@@ -22,17 +23,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class WordnetService implements DictionaryService {
+public final class WordnetService implements DictionaryService {
 
-    private static WordnetService INSTANCE = new WordnetService();
-    private static final String path = ".\\src\\main\\resources\\wordnet\\dict";
+    private static WordnetService instance = new WordnetService();
+    private static final String DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
     private URL url;
     private IDictionary dict;
     private WordnetStemmer wordnetStemmer;
 
     private WordnetService() {
         try {
-            url = new URL("file", null, path);
+            url = new URL("file", null, DICT_PATH);
         } catch (MalformedURLException e) {
             throw new DictionaryException("No dictionary data found at " + url, e);
         }
@@ -47,7 +48,7 @@ public class WordnetService implements DictionaryService {
     }
 
     public static WordnetService getInstance() {
-        return INSTANCE;
+        return instance;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class WordnetService implements DictionaryService {
                         .filter(w -> !w.toLowerCase().equals(rootWord.toLowerCase()))
                         .collect(Collectors.joining(", "));
 
-                if (StringUtils.isNotBlank(synonyms)){
+                if (StringUtils.isNotBlank(synonyms)) {
 
                     stringBuilder.append("\nsyn: ")
                             .append(synonyms);
@@ -98,31 +99,24 @@ public class WordnetService implements DictionaryService {
         return stringBuilder.toString();
     }
 
-/*    private Map<POS, String> wordTypeAlias = ImmutableMap.<POS, String>builder()
-            .put(POS.ADJECTIVE, "adv.")
-            .put(POS.ADVERB, "adj.")
-            .put(POS.NOUN, "noun.")
-            .put(POS.VERB, "verb.")
-            .build();*/
-
-    private enum WordTypeAlias{
-        adjective("adjective", "adj."),
-        adverb("adverb" , "adv."),
-        noun("noun", "noun."),
-        verb("verb", "verb.")
-        ;
+    private enum WordTypeAlias {
+        ADJECTIVE("adjective", "adj."),
+        ADVERB("adverb", "adv."),
+        NOUN("noun", "noun."),
+        VERB("verb", "verb.");
 
         private final String alias;
         private final String name;
+
         WordTypeAlias(String name, String alias) {
             this.alias = alias;
             this.name = name;
         }
 
         public static String getByName(String name) {
-        Optional<String> aliasz =    Arrays.stream(WordTypeAlias.values()).map(WordTypeAlias::getName)
+            Optional<String> aliasz = Arrays.stream(WordTypeAlias.values()).map(WordTypeAlias::getName)
                     .filter(w -> w.equals(name)).findFirst();
-            return  aliasz.get();
+            return aliasz.get();
         }
 
         public String getAlias() {
