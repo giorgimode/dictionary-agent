@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Created by modeg on 9/4/2016.
  */
-public interface DictionaryService {
+public interface Dictionary {
 
 /*    *//*
     * @param file dictionary text file to be parsed

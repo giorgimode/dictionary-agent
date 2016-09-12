@@ -1,9 +1,8 @@
 package com.giorgimode.dictionary.impl;
 
-import com.giorgimode.dictionary.api.DictionaryService;
+import com.giorgimode.dictionary.api.Dictionary;
 import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.exception.DictionaryReaderException;
-import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.item.IIndexWord;
 import edu.mit.jwi.item.ISynset;
@@ -23,22 +22,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public final class WordnetService implements DictionaryService {
+public final class WordnetDictionary implements Dictionary {
 
-    private static WordnetService instance = new WordnetService();
-    private static final String DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
+    private static       WordnetDictionary instance  = new WordnetDictionary();
+    private static final String            DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
     private URL url;
     private IDictionary dict;
     private WordnetStemmer wordnetStemmer;
 
-    private WordnetService() {
+    private WordnetDictionary() {
         try {
             url = new URL("file", null, DICT_PATH);
         } catch (MalformedURLException e) {
             throw new DictionaryException("No dictionary data found at " + url, e);
         }
 
-        dict = new Dictionary(url);
+        dict = new edu.mit.jwi.Dictionary(url);
         try {
             dict.open();
         } catch (IOException e) {
@@ -47,7 +46,7 @@ public final class WordnetService implements DictionaryService {
         wordnetStemmer = new WordnetStemmer(dict);
     }
 
-    public static WordnetService getInstance() {
+    public static WordnetDictionary getInstance() {
         return instance;
     }
 
