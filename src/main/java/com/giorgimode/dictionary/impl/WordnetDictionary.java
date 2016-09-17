@@ -66,32 +66,25 @@ public final class WordnetDictionary implements Dictionary {
 
             rootWords.forEach(rootWord -> {
                 IIndexWord idxWord = dict.getIndexWord(rootWord, wordType);
-                IWordID wordID = idxWord.getWordIDs().get(0);
-                IWord iWord = dict.getWord(wordID);
+                List<IWordID> wordIDList = idxWord.getWordIDs();
+                wordIDList.forEach(iWordID -> {
+                    IWord iWord = dict.getWord(iWordID);
 
-                String lemma = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? "" : " (root: " + iWord.getLemma() + ")";
+                    // root word
+                    String lemma = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? "" : " (root: " + iWord.getLemma() + ")";
 
-                // synonyms
-                ISynset synset = iWord.getSynset();
-                stringBuilder.append("\n")
-                        .append(WordTypeAlias.getByName(wordType.name().toLowerCase()))
-                        .append(lemma)
-                        .append("\n")
-                        .append(synset.getGloss());
+                    // definitions
+                    ISynset synset = iWord.getSynset();
+                    stringBuilder
+                            .append(WordTypeAlias.getByName(wordType.name().toLowerCase()))
+                            .append(lemma)
+                            .append("\n")
+                            .append(synset.getGloss())
+                            .append("\n");
 
-                // iterate over words associated with the synset
-                String synonyms = synset.getWords().stream()
-                        .map(IWord::getLemma)
-                        .filter(w -> !w.toLowerCase().equals(rootWord.toLowerCase()))
-                        .collect(Collectors.joining(", "));
+                    stringBuilder.append("---\n");
+                });
 
-                if (StringUtils.isNotBlank(synonyms)) {
-
-                    stringBuilder.append("\nsyn: ")
-                            .append(synonyms);
-                }
-
-                stringBuilder.append("\n---");
             });
         });
 
@@ -99,10 +92,10 @@ public final class WordnetDictionary implements Dictionary {
     }
 
     private enum WordTypeAlias {
-        ADJECTIVE("adjective", "adj."),
-        ADVERB("adverb", "adv."),
-        NOUN("noun", "noun."),
-        VERB("verb", "verb.");
+        ADJECTIVE("adjective", "(adj.)"),
+        ADVERB("adverb", "(adv.)"),
+        NOUN("noun", "(n.)"),
+        VERB("verb", "(v.)");
 
         private final String alias;
         private final String name;
@@ -113,8 +106,8 @@ public final class WordnetDictionary implements Dictionary {
         }
 
         public static String getByName(String name) {
-            Optional<String> aliasz = Arrays.stream(WordTypeAlias.values()).map(WordTypeAlias::getName)
-                    .filter(w -> w.equals(name)).findFirst();
+            Optional<String> aliasz = Arrays.stream(WordTypeAlias.values())
+                    .filter(w -> w.name.equals(name)).findFirst().map(WordTypeAlias::getAlias);
             return aliasz.get();
         }
 
