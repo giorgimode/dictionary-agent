@@ -8,6 +8,7 @@
     <artifactId>dictionary</artifactId>
     <version>1.0.0</version>
 
+	
     <repositories>
         <repository>
             <id>my-local-repo</id>
