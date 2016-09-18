@@ -1,9 +1,12 @@
 package com.giorgimode.dictionary.impl;
 
-import com.giorgimode.dictionary.api.Dictionary;
+import com.giorgimode.dictionary.api.DictionaryService;
 import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.exception.DictionaryReaderException;
+import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
+import edu.mit.jwi.IRAMDictionary;
+import edu.mit.jwi.RAMDictionary;
 import edu.mit.jwi.item.IIndexWord;
 import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
@@ -19,22 +22,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public final class WordnetDictionary implements Dictionary {
+public final class WordnetDictionaryService implements DictionaryService {
 
-    private static       WordnetDictionary instance  = new WordnetDictionary();
-    private static final String            DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
-    private URL            url;
-    private IDictionary    dict;
-    private WordnetStemmer wordnetStemmer;
+    private static final String DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
+    private static URL            url;
+    private static IDictionary    dict;
+    private static WordnetStemmer wordnetStemmer;
 
-    private WordnetDictionary() {
+    private WordnetDictionaryService(int loadPolicy) {
         try {
             url = new URL("file", null, DICT_PATH);
         } catch (MalformedURLException e) {
             throw new DictionaryException("No dictionary data found at " + url, e);
         }
-
-        dict = new edu.mit.jwi.Dictionary(url);
+        if (loadPolicy != 0) {
+            dict = new RAMDictionary(url, loadPolicy);
+        } else {
+            dict = new Dictionary(url);
+        }
         try {
             dict.open();
         } catch (IOException e) {
@@ -43,8 +48,19 @@ public final class WordnetDictionary implements Dictionary {
         wordnetStemmer = new WordnetStemmer(dict);
     }
 
-    public static WordnetDictionary getInstance() {
-        return instance;
+    public static WordnetDictionaryService getInstance() {
+        return new WordnetDictionaryService(0);
+    }
+
+    public static WordnetDictionaryService getInMemoryInstance(int loadPolicy) {
+        return new WordnetDictionaryService(loadPolicy);
+    }
+
+    public void loadInMemoryDictionary() {
+        if (dict instanceof IRAMDictionary && !((IRAMDictionary) dict).isLoaded()) {
+            System.out.println("tarzan");
+            ((IRAMDictionary) dict).load();
+        }
     }
 
     @Override
