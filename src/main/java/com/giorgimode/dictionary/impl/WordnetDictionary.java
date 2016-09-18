@@ -5,7 +5,6 @@ import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.exception.DictionaryReaderException;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.item.IIndexWord;
-import edu.mit.jwi.item.ISynset;
 import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
@@ -24,8 +23,8 @@ public final class WordnetDictionary implements Dictionary {
 
     private static       WordnetDictionary instance  = new WordnetDictionary();
     private static final String            DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
-    private URL url;
-    private IDictionary dict;
+    private URL            url;
+    private IDictionary    dict;
     private WordnetStemmer wordnetStemmer;
 
     private WordnetDictionary() {
@@ -51,37 +50,47 @@ public final class WordnetDictionary implements Dictionary {
     @Override
     public Map<String, String> retrieveDefinitions(String[] wordsToTranslate) {
         Map<String, String> definitons = new HashMap<>(wordsToTranslate.length);
-        Arrays.stream(wordsToTranslate).forEach(wordToTranslate ->
-                definitons.put(wordToTranslate, retrieveDefiniton(wordToTranslate)));
-
+        Arrays.stream(wordsToTranslate).forEach(wordToTranslate -> {
+            if (wordToTranslate != null && wordToTranslate.length() > 2) {
+                definitons.put(wordToTranslate, retrieveDefiniton(wordToTranslate));
+            }
+        });
         return definitons;
     }
 
     private String retrieveDefiniton(String word) {
         StringBuilder stringBuilder = new StringBuilder();
         Arrays.stream(POS.values()).forEach(wordType -> {
-            List<String> rootWords = wordnetStemmer.findStems(word, wordType);
+            List<String> stemWords = wordnetStemmer.findStems(word, wordType);
+            stemWords.forEach(stemWord -> {
+                IIndexWord idxWord = dict.getIndexWord(stemWord, wordType);
+                if (idxWord != null) {
+                    List<IWordID> wordIDList = idxWord.getWordIDs();
+                    wordIDList.forEach(iWordID -> {
+                        IWord iWord = dict.getWord(iWordID);
+                        if (iWord != null) {
 
-            rootWords.forEach(rootWord -> {
-                IIndexWord idxWord = dict.getIndexWord(rootWord, wordType);
-                List<IWordID> wordIDList = idxWord.getWordIDs();
-                wordIDList.forEach(iWordID -> {
-                    IWord iWord = dict.getWord(iWordID);
+                            String root = "";
+                            if (iWord.getLemma() != null) {
+                                // root word
+                                root = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? "" : " (root: "
+                                                                                                        + iWord.getLemma() + ")";
+                            }
 
-                    // root word
-                    String lemma = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? "" : " (root: " + iWord.getLemma() + ")";
+                            // definitions
+                            String gloss = iWord.getSynset() != null ? iWord.getSynset().getGloss() : null;
 
-                    // definitions
-                    ISynset synset = iWord.getSynset();
-                    stringBuilder
-                            .append(WordTypeAlias.getByName(wordType.name().toLowerCase()))
-                            .append(lemma)
-                            .append("\n")
-                            .append(synset.getGloss())
-                            .append("\n");
+                            stringBuilder
+                                    .append(WordTypeAlias.getByName(wordType.name().toLowerCase()))
+                                    .append(root)
+                                    .append("\n")
+                                    .append(gloss)
+                                    .append("\n");
 
-                    stringBuilder.append("---\n");
-                });
+                            stringBuilder.append("---\n");
+                        }
+                    });
+                }
 
             });
         });
@@ -105,7 +114,7 @@ public final class WordnetDictionary implements Dictionary {
 
         public static String getByName(String name) {
             Optional<String> aliasz = Arrays.stream(WordTypeAlias.values())
-                    .filter(w -> w.name.equals(name)).findFirst().map(WordTypeAlias::getAlias);
+                                            .filter(w -> w.name.equals(name)).findFirst().map(WordTypeAlias::getAlias);
             return aliasz.get();
         }
 
@@ -117,4 +126,6 @@ public final class WordnetDictionary implements Dictionary {
             return name;
         }
     }
+
+
 }
