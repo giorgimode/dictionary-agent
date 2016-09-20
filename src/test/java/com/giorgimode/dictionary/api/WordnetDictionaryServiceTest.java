@@ -23,8 +23,9 @@ public class WordnetDictionaryServiceTest {
 
     @Test
     public void retrieveDefinitionsTest() throws Exception {
-        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
+        String[] wordsToTranslate = new String[]{"regurgitated"};
         Map<String, String> definitions = retrieveDefinitions(wordsToTranslate);
+        definitions.entrySet().forEach(d -> System.out.println(d + "\n"));
     }
 
     @Test
