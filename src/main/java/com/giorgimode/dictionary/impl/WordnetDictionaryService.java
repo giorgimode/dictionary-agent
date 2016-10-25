@@ -90,7 +90,8 @@ public final class WordnetDictionaryService implements DictionaryService {
                             String root = "";
                             if (iWord.getLemma() != null) {
                                 // root word
-                                root = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? word.toLowerCase() : iWord.getLemma();
+                                root = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? word.toLowerCase()
+                                        : iWord.getLemma().toLowerCase();
                             }
 
                             // definitions
