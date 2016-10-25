@@ -5,6 +5,7 @@ import edu.mit.jwi.data.ILoadPolicy;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,38 +17,43 @@ public class WordnetDictionaryServiceTest {
     public void retrieveDefinitionsBothTest() throws Exception {
         String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
 
-        Map<String, String> definitions = retrieveDefinitions(wordsToTranslate);
-        Map<String, String> definitionsInMemory = retrieveDefinitionsInMemory(wordsToTranslate);
+        Map<String, Map<String, List<String>>> definitions = retrieveDefinitions(wordsToTranslate);
+        Map<String, Map<String, List<String>>> definitionsInMemory = retrieveDefinitionsInMemory(wordsToTranslate);
         //  definitions.entrySet().forEach(d -> System.out.println(d + "\n"));
     }
 
     @Test
     public void retrieveDefinitionsTest() throws Exception {
-        String[] wordsToTranslate = new String[]{"regurgitated"};
-        Map<String, String> definitions = retrieveDefinitions(wordsToTranslate);
-        definitions.entrySet().forEach(d -> System.out.println(d + "\n"));
+        String[] wordsToTranslate = new String[]{"breaking"};
+        Map<String, Map<String, List<String>>> definitions = retrieveDefinitions(wordsToTranslate);
+        definitions.entrySet().forEach(map -> {
+            map.getValue().entrySet().forEach(list -> {
+                System.out.println(list.getKey() + ": ");
+                list.getValue().forEach(word -> System.out.println(word));
+            });
+        });
     }
 
     @Test
     public void retrieveDefinitionsInMemoryTest() throws Exception {
         String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
-        Map<String, String> definitions = retrieveDefinitionsInMemory(wordsToTranslate);
+        Map<String, Map<String, List<String>>> definitions = retrieveDefinitionsInMemory(wordsToTranslate);
     }
 
-    private Map<String, String> retrieveDefinitions(String[] wordsToTranslate){
+    private Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate){
         WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInstance();
         long start = System.currentTimeMillis();
-        Map<String, String> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
+        Map<String, Map<String, List<String>>> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
         long timespent = System.currentTimeMillis() - start;
         System.out.println("TIME FOR GETTING DEFINITIONS:\n" + timespent);
 
         return definitions;
     }
 
-    private Map<String, String> retrieveDefinitionsInMemory(String[] wordsToTranslate){
+    private Map<String, Map<String, List<String>>> retrieveDefinitionsInMemory(String[] wordsToTranslate){
         WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInMemoryInstance(ILoadPolicy.IMMEDIATE_LOAD);
         long start = System.currentTimeMillis();
-        Map<String, String> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
+        Map<String, Map<String, List<String>>> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
         long timespent = System.currentTimeMillis() - start;
         System.out.println("TIME FOR GETTING DEFINITIONS IN_MEMORY:\n" + timespent);
 
@@ -56,11 +62,11 @@ public class WordnetDictionaryServiceTest {
 
     @Test
     public void retrieveDefinitionsInMemoryTest2() throws Exception {
-        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
+        String[] wordsToTranslate = new String[]{"letters"};
         WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInMemoryInstance(ILoadPolicy.NO_LOAD);
         wordnetDictionary.loadInMemoryDictionary();
         long start = System.currentTimeMillis();
-        Map<String, String> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
+        Map<String, Map<String, List<String>>> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
         long timespent = System.currentTimeMillis() - start;
         System.out.println("TIME FOR GETTING DEFINITIONS IN_MEMORY:\n" + timespent);
     }

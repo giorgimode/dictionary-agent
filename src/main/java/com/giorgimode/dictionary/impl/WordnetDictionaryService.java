@@ -16,6 +16,7 @@ import edu.mit.jwi.morph.WordnetStemmer;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -64,8 +65,8 @@ public final class WordnetDictionaryService implements DictionaryService {
     }
 
     @Override
-    public Map<String, String> retrieveDefinitions(String[] wordsToTranslate) {
-        Map<String, String> definitons = new HashMap<>(wordsToTranslate.length);
+    public Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {
+        Map<String, Map<String, List<String>>> definitons = new HashMap<>(wordsToTranslate.length);
         Arrays.stream(wordsToTranslate).forEach(wordToTranslate -> {
             if (wordToTranslate != null && wordToTranslate.length() > 2) {
                 definitons.put(wordToTranslate, retrieveDefiniton(wordToTranslate));
@@ -74,8 +75,8 @@ public final class WordnetDictionaryService implements DictionaryService {
         return definitons;
     }
 
-    private String retrieveDefiniton(String word) {
-        StringBuilder stringBuilder = new StringBuilder();
+    private Map<String, List<String>> retrieveDefiniton(String word) {
+        Map<String, List<String>> definitionMap = new HashMap<>();
         Arrays.stream(POS.values()).forEach(wordType -> {
             List<String> stemWords = wordnetStemmer.findStems(word, wordType);
             stemWords.forEach(stemWord -> {
@@ -89,29 +90,33 @@ public final class WordnetDictionaryService implements DictionaryService {
                             String root = "";
                             if (iWord.getLemma() != null) {
                                 // root word
-                                root = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? "" : " (root: "
-                                                                                                        + iWord.getLemma() + ")";
+                                root = iWord.getLemma().toLowerCase().equals(word.toLowerCase()) ? word.toLowerCase() : iWord.getLemma();
                             }
 
                             // definitions
                             String gloss = iWord.getSynset() != null ? iWord.getSynset().getGloss() : null;
-
+                            StringBuilder stringBuilder = new StringBuilder();
                             stringBuilder
                                     .append(WordTypeAlias.getByName(wordType.name().toLowerCase()))
-                                    .append(root)
-                                    .append("\n")
-                                    .append(gloss)
-                                    .append("\n");
+                                    .append(" ")
+                                    .append(gloss);
 
-                            stringBuilder.append("---\n");
+                            //   stringBuilder.append("---\n");
+                            root = root.isEmpty() ? word : root;
+                            List<String> list = definitionMap.get(root);
+                            if (list == null) {
+                                definitionMap.put(root, new ArrayList<>(Arrays.asList(stringBuilder.toString())));
+                            } else {
+                                list.add(stringBuilder.toString());
+                            }
+
                         }
                     });
                 }
-
             });
         });
 
-        return stringBuilder.toString();
+        return definitionMap;
     }
 
     private enum WordTypeAlias {

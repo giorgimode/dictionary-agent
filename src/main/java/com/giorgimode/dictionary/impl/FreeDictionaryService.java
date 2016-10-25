@@ -2,6 +2,7 @@ package com.giorgimode.dictionary.impl;
 
 import com.giorgimode.dictionary.api.DictionaryService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Map;
 public class FreeDictionaryService implements DictionaryService {
 
     @Override
-    public Map<String, String> retrieveDefinitions(String[] words) {
+    public Map<String, Map<String, List<String>>> retrieveDefinitions(String[] words) {
         return null;
     }
 }

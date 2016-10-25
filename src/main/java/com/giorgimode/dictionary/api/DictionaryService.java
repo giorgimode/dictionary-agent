@@ -1,5 +1,6 @@
 package com.giorgimode.dictionary.api;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,5 +14,5 @@ public interface DictionaryService {
     * *//*
     public Map<String, String> parseDictionary(File dictionaryFile);*/
 
-    Map<String, String> retrieveDefinitions(String[] words);
+    Map<String, Map<String, List<String>>> retrieveDefinitions(String[] words);
 }
