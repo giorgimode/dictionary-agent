@@ -101,8 +101,6 @@ public final class WordnetDictionaryService implements DictionaryService {
                                     .append(" ")
                                     .append(gloss);
 
-                            //   stringBuilder.append("---\n");
-                            root = root.isEmpty() ? word : root;
                             List<String> list = definitionMap.get(root);
                             if (list == null) {
                                 definitionMap.put(root, new ArrayList<>(Arrays.asList(stringBuilder.toString())));
