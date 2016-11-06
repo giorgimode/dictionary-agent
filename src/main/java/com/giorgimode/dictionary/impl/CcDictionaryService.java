@@ -32,7 +32,9 @@ public class CcDictionaryService implements DictionaryService {
     private static Map<String, Properties> allProperties;
 
     private CcDictionaryService(CcLanguageEnum language) {
-        this.language = language;
+        if (this.language == null) {
+            this.language = language;
+        }
     }
 
     @Override
@@ -40,10 +42,12 @@ public class CcDictionaryService implements DictionaryService {
         Map<String, Properties> propertiesMap = getProperties(words);
         Map<String, Map<String, List<String>>> finalMap = new HashMap<>(words.length);
         for (String rootWord : words) {
-            Properties prop = propertiesMap.get(rootWord.substring(0, 1));
-            if (prop != null && !prop.isEmpty()) {
-                finalMap.put(rootWord, getMap(rootWord, prop));
-            }
+           if (rootWord != null && !rootWord.trim().isEmpty()) {
+               Properties prop = propertiesMap.get(rootWord.substring(0, 1));
+               if (prop != null && !prop.isEmpty()) {
+                   finalMap.put(rootWord, getMap(rootWord, prop));
+               }
+           }
         }
         return finalMap;
     }
@@ -120,7 +124,8 @@ public class CcDictionaryService implements DictionaryService {
         return new CcDictionaryService(language);
     }
 
-    public static CcDictionaryService getInMemoryInstance(CcLanguageEnum language) {
+    public static CcDictionaryService getInMemoryInstance(CcLanguageEnum lang) {
+        language = lang;
         allProperties = loadAllProperties();
         return new CcDictionaryService(language);
     }
