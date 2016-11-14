@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -18,7 +18,7 @@ import java.util.TreeMap;
 /**
  * Created by modeg on 10/30/2016.
  */
-public class CcDictionaryService implements DictionaryService {
+public final class CcDictionaryService implements DictionaryService {
     private static final String DICT_PATH                     = ".\\src\\main\\resources\\cc";
     private static       String dictionaryDataPath            = ".\\src\\main\\resources\\cc\\";
     private static final String KEY_VALUE_SPLIT               = "-->";
@@ -40,14 +40,14 @@ public class CcDictionaryService implements DictionaryService {
     @Override
     public Map<String, Map<String, List<String>>> retrieveDefinitions(String[] words) {
         Map<String, Properties> propertiesMap = getProperties(words);
-        Map<String, Map<String, List<String>>> finalMap = new HashMap<>(words.length);
+        Map<String, Map<String, List<String>>> finalMap = new LinkedHashMap<>(words.length);
         for (String rootWord : words) {
-           if (rootWord != null && !rootWord.trim().isEmpty()) {
-               Properties prop = propertiesMap.get(rootWord.substring(0, 1));
-               if (prop != null && !prop.isEmpty()) {
-                   finalMap.put(rootWord, getMap(rootWord, prop));
-               }
-           }
+            if (rootWord != null && !rootWord.trim().isEmpty()) {
+                Properties prop = propertiesMap.get(rootWord.toLowerCase().substring(0, 1));
+                if (prop != null && !prop.isEmpty()) {
+                    finalMap.put(rootWord, getMap(rootWord.toLowerCase(), prop));
+                }
+            }
         }
         return finalMap;
     }
@@ -71,18 +71,19 @@ public class CcDictionaryService implements DictionaryService {
     }
 
     private Map<String, String> getValueMap(String rootWord, Properties prop) {
-        // line:  autositzbezüge=Autositzbezüge {pl}-->auto seat covers	noun && Autositzbezüge {pl}(1)-->car seat covers	noun &&
+        // line:  autositzbezüge=Autositzbezüge {pl}-->auto seat covers noun && Autositzbezüge {pl}(1)-->car seat covers noun &&
 
-        // property value: Autositzbezüge {pl}-->auto seat covers	noun && Autositzbezüge {pl}(1)-->car seat covers	noun
+        // property value: Autositzbezüge {pl}-->auto seat covers noun && Autositzbezüge {pl}(1)-->car seat covers noun
         Object propertyValueObject = prop.get(rootWord);
-        if (propertyValueObject == null)
+        if (propertyValueObject == null) {
             return new TreeMap<>();
+        }
         String propertyValue = String.valueOf(propertyValueObject);
-        // arrayOfDefinitons: [Autositzbezüge {pl}-->auto seat covers	noun], [Autositzbezüge {pl}(1)-->car seat covers	noun]
-        String arrayOfDefinitons[] = propertyValue.split(DEFINITION_SPLIT);
+        // arrayOfDefinitons: [Autositzbezüge {pl}-->auto seat covers noun], [Autositzbezüge {pl}(1)-->car seat covers noun]
+        String[] arrayOfDefinitons = propertyValue.split(DEFINITION_SPLIT);
         Map<String, String> valueMap = new TreeMap<>();
         for (String definition : arrayOfDefinitons) {
-            // valueAndDefinition: [Autositzbezüge {pl}], [auto seat covers	noun]
+            // valueAndDefinition: [Autositzbezüge {pl}], [auto seat covers noun]
             String[] valueAndDefinition = definition.split(KEY_VALUE_SPLIT);
             if (valueAndDefinition.length > 0 && valueAndDefinition.length != 2) {
                 throw new InvalidDictionaryLineException("Invalid formatting on line: " + definition);
@@ -101,7 +102,7 @@ public class CcDictionaryService implements DictionaryService {
         Map<String, Properties> propertiesMap = new TreeMap<>();
         Arrays.stream(words)
               .filter(word -> word != null && word != "")
-              .map(word -> word.substring(0, 1))
+              .map(word -> word.toLowerCase().substring(0, 1))
               .filter(letter -> !propertiesMap.containsKey(letter))
               .forEach(letter -> {
                   Properties prop = loadProperyFile(letter);
@@ -130,13 +131,18 @@ public class CcDictionaryService implements DictionaryService {
         return new CcDictionaryService(language);
     }
 
+    public static CcDictionaryService getInMemoryInstance(CcLanguageEnum lang, String path) {
+        setDictionaryDataPath(path);
+        return getInMemoryInstance(lang);
+    }
+
     private static Properties loadProperyFile(String letter) {
         Properties prop = new Properties();
         String propertyPath = dictionaryDataPath + language.getValue() + "\\" + letter + FILE_FORMAT_PROPERTY;
         try {
             prop.load(new FileReader(propertyPath));
         } catch (IOException e) {
-          //  throw new DictionaryReaderException("Property file not found at: " + propertyPath);
+            //  throw new DictionaryReaderException("Property file not found at: " + propertyPath);
             System.out.println("Property file not found at: " + propertyPath);
         }
         return prop;

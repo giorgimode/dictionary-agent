@@ -71,6 +71,7 @@
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
+                            <includeResources>false</includeResources>
                             <!--<linkXRef>false</linkXRef>-->
                         </configuration>
                         <goals>
@@ -93,7 +94,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <failOnError>true</failOnError>
+                    <failOnError>false</failOnError>
                     <includeTests>false</includeTests>
                     <threshold>High</threshold>
                     <effort>Max</effort>

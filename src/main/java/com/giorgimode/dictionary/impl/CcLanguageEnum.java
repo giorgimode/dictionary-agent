@@ -109,11 +109,11 @@ public enum CcLanguageEnum {
 
     private final String value;
 
-    CcLanguageEnum(String value){
+    CcLanguageEnum(String value) {
         this.value = value;
     }
 
-    public String getValue(){
+    public String getValue() {
         return value;
     }
 
