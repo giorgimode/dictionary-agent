@@ -59,7 +59,6 @@ public final class WordnetDictionaryService implements DictionaryService {
 
     public void loadInMemoryDictionary() {
         if (dict instanceof IRAMDictionary && !((IRAMDictionary) dict).isLoaded()) {
-            System.out.println("tarzan");
             ((IRAMDictionary) dict).load();
         }
     }

@@ -9,6 +9,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +34,8 @@ public final class CcDictionaryService implements DictionaryService {
     private static Map<String, Properties> allProperties;
 
     private CcDictionaryService(CcLanguageEnum language) {
-        if (this.language == null) {
-            this.language = language;
+        if (CcDictionaryService.language == null) {
+            CcDictionaryService.language = language;
         }
     }
 
@@ -54,17 +56,16 @@ public final class CcDictionaryService implements DictionaryService {
 
     private Map<String, List<String>> getMap(String rootWord, Properties prop) {
         Map<String, String> duplicateKeyMap = getValueMap(rootWord, prop);
-        Map<String, List<String>> keyValueMap = new TreeMap<>();
+        Map<String, List<String>> keyValueMap = new TreeMap<>(treemapComparator(rootWord));
         duplicateKeyMap.entrySet().forEach(set -> {
             String key = set.getKey();
             if (key.matches(DUPLICATE_KEY_PATTERN)) {
                 key = key.replaceAll(DUPLICATE_KEY_COUNTER_PATTERN, "");
             }
             if (keyValueMap.containsKey(key)) {
-//                System.out.println("key: " + key + ", value: " + set.getValue());
                 keyValueMap.get(key).add(set.getValue());
             } else {
-                keyValueMap.put(key, new ArrayList<>(Arrays.asList(set.getValue())));
+                keyValueMap.put(key, new ArrayList<>(Collections.singletonList(set.getValue())));
             }
         });
         return keyValueMap;
@@ -101,7 +102,7 @@ public final class CcDictionaryService implements DictionaryService {
         }
         Map<String, Properties> propertiesMap = new TreeMap<>();
         Arrays.stream(words)
-              .filter(word -> word != null && word != "")
+              .filter(word -> word != null && !word.isEmpty())
               .map(word -> word.toLowerCase().substring(0, 1))
               .filter(letter -> !propertiesMap.containsKey(letter))
               .forEach(letter -> {
@@ -131,6 +132,21 @@ public final class CcDictionaryService implements DictionaryService {
         return new CcDictionaryService(language);
     }
 
+    private Comparator<String> treemapComparator(String rootWord) {
+        return (o1, o2) -> {
+            if (o1.equalsIgnoreCase(o2)) {
+                return 0;
+            }
+            if (o1.equalsIgnoreCase(rootWord)) {
+                return -1;
+            }
+            if (o2.equalsIgnoreCase(rootWord)) {
+                return 1;
+            }
+            return o1.compareTo(o2);
+        };
+    }
+
     public static CcDictionaryService getInMemoryInstance(CcLanguageEnum lang, String path) {
         setDictionaryDataPath(path);
         return getInMemoryInstance(lang);
@@ -142,8 +158,7 @@ public final class CcDictionaryService implements DictionaryService {
         try {
             prop.load(new FileReader(propertyPath));
         } catch (IOException e) {
-            //  throw new DictionaryReaderException("Property file not found at: " + propertyPath);
-            System.out.println("Property file not found at: " + propertyPath);
+            throw new DictionaryReaderException("Property file not found at: " + propertyPath);
         }
         return prop;
     }
@@ -153,6 +168,9 @@ public final class CcDictionaryService implements DictionaryService {
         String propertyDirectoryPath = dictionaryDataPath + language.getValue() + "\\";
         File folder = new File(propertyDirectoryPath);
         File[] listOfFiles = folder.listFiles();
+        if (listOfFiles == null) {
+            throw new DictionaryReaderException("Property files not found at: " + folder.getAbsolutePath());
+        }
         for (int i = 0; i < listOfFiles.length; i++) {
             String fileName = listOfFiles[i].getName();
             if (listOfFiles[i].isFile() && fileName.endsWith(FILE_FORMAT_PROPERTY)) {
