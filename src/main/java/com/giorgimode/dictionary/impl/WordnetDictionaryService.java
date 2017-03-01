@@ -25,14 +25,14 @@ import java.util.Optional;
 
 public final class WordnetDictionaryService implements DictionaryService {
 
-    private static final String DICT_PATH = ".\\src\\main\\resources\\wordnet\\dict";
-    private static URL            url;
+    public static final String EN_EN = "en-en";
+    private static URL url;
     private static IDictionary    dict;
     private static WordnetStemmer wordnetStemmer;
 
-    private WordnetDictionaryService(int loadPolicy) {
+    private WordnetDictionaryService(int loadPolicy, String path) {
         try {
-            url = new URL("file", null, DICT_PATH);
+            url = new URL("file", null, path + EN_EN);
         } catch (MalformedURLException e) {
             throw new DictionaryException("No dictionary data found at " + url, e);
         }
@@ -49,12 +49,12 @@ public final class WordnetDictionaryService implements DictionaryService {
         wordnetStemmer = new WordnetStemmer(dict);
     }
 
-    public static WordnetDictionaryService getInstance() {
-        return new WordnetDictionaryService(0);
+    public static WordnetDictionaryService getInstance(String path) {
+        return new WordnetDictionaryService(0, path);
     }
 
-    public static WordnetDictionaryService getInMemoryInstance(int loadPolicy) {
-        return new WordnetDictionaryService(loadPolicy);
+    public static WordnetDictionaryService getInMemoryInstance(int loadPolicy, String path) {
+        return new WordnetDictionaryService(loadPolicy, path);
     }
 
     public void loadInMemoryDictionary() {

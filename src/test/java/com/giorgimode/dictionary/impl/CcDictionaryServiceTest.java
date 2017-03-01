@@ -3,11 +3,8 @@ package com.giorgimode.dictionary.impl;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by modeg on 11/1/2016.
@@ -21,7 +18,9 @@ public class CcDictionaryServiceTest {
 
     @Test
     public void retrieveDefinitions() throws Exception {
-        ccDictionaryService = CcDictionaryService.getInMemoryInstance(CcLanguageEnum.EN_DE);
+        String path = ".\\src\\test\\resources\\";
+
+        ccDictionaryService = CcDictionaryService.getInMemoryInstance(LanguageEnum.EN_DE, path);
 
 //  String[] wordsToTranslate = new String[]{"breaking"};
         String[] wordsToTranslate = new String[]{"could"};
@@ -41,7 +40,7 @@ public class CcDictionaryServiceTest {
 
 
     private Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {
-        ccDictionaryService = ccDictionaryService == null ? CcDictionaryService.getInstance(CcLanguageEnum.EN_DE) : ccDictionaryService;
+        ccDictionaryService = ccDictionaryService == null ? CcDictionaryService.getInstance(LanguageEnum.EN_DE) : ccDictionaryService;
         long start = System.currentTimeMillis();
         Map<String, Map<String, List<String>>> definitions = ccDictionaryService.retrieveDefinitions(wordsToTranslate);
         long timespent = System.currentTimeMillis() - start;

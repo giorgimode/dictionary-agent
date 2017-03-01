@@ -72,6 +72,7 @@
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
                             <includeResources>false</includeResources>
+                            <includeTestResources>false</includeTestResources>
                             <!--<linkXRef>false</linkXRef>-->
                         </configuration>
                         <goals>

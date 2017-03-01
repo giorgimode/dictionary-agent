@@ -21,19 +21,16 @@ import java.util.TreeMap;
  * Created by modeg on 10/30/2016.
  */
 public final class CcDictionaryService implements DictionaryService {
-    private static final String DICT_PATH                     = ".\\src\\main\\resources\\cc";
-    private static       String dictionaryDataPath            = ".\\src\\main\\resources\\cc\\";
+    private static String dictionaryDataPath;
     private static final String KEY_VALUE_SPLIT               = "-->";
     private static final String DEFINITION_SPLIT              = " && ";
     private static final String FILE_FORMAT_PROPERTY          = ".properties";
-    private static final String SYNTAX_FILE_NAME              = "syntax.txt";
     private static final String DUPLICATE_KEY_PATTERN         = "^.*~\\d+~$";
     private static final String DUPLICATE_KEY_COUNTER_PATTERN = "~\\d+~";
-    private static Properties              properties;
-    private static CcLanguageEnum          language;
+    private static LanguageEnum            language;
     private static Map<String, Properties> allProperties;
 
-    private CcDictionaryService(CcLanguageEnum language) {
+    private CcDictionaryService(LanguageEnum language) {
         if (CcDictionaryService.language == null) {
             CcDictionaryService.language = language;
         }
@@ -52,6 +49,17 @@ public final class CcDictionaryService implements DictionaryService {
             }
         }
         return finalMap;
+    }
+
+    public static CcDictionaryService getInstance(LanguageEnum language) {
+        return new CcDictionaryService(language);
+    }
+
+    public static CcDictionaryService getInMemoryInstance(LanguageEnum lang, String path) {
+        dictionaryDataPath = path;
+        language = lang;
+        allProperties = loadAllProperties();
+        return new CcDictionaryService(language);
     }
 
     private Map<String, List<String>> getMap(String rootWord, Properties prop) {
@@ -97,7 +105,7 @@ public final class CcDictionaryService implements DictionaryService {
     }
 
     private Map<String, Properties> getProperties(String[] words) {
-        if (allProperties != null) {
+        if (allProperties != null && allProperties.size() > 0) {
             return allProperties;
         }
         Map<String, Properties> propertiesMap = new TreeMap<>();
@@ -118,20 +126,6 @@ public final class CcDictionaryService implements DictionaryService {
         return dictionaryDataPath;
     }
 
-    public static void setDictionaryDataPath(String dictionaryPath) {
-        dictionaryDataPath = dictionaryPath;
-    }
-
-    public static CcDictionaryService getInstance(CcLanguageEnum language) {
-        return new CcDictionaryService(language);
-    }
-
-    public static CcDictionaryService getInMemoryInstance(CcLanguageEnum lang) {
-        language = lang;
-        allProperties = loadAllProperties();
-        return new CcDictionaryService(language);
-    }
-
     private Comparator<String> treemapComparator(String rootWord) {
         return (o1, o2) -> {
             if (o1.equalsIgnoreCase(o2)) {
@@ -145,11 +139,6 @@ public final class CcDictionaryService implements DictionaryService {
             }
             return o1.compareTo(o2);
         };
-    }
-
-    public static CcDictionaryService getInMemoryInstance(CcLanguageEnum lang, String path) {
-        setDictionaryDataPath(path);
-        return getInMemoryInstance(lang);
     }
 
     private static Properties loadProperyFile(String letter) {
@@ -171,15 +160,15 @@ public final class CcDictionaryService implements DictionaryService {
         if (listOfFiles == null) {
             throw new DictionaryReaderException("Property files not found at: " + folder.getAbsolutePath());
         }
-        for (int i = 0; i < listOfFiles.length; i++) {
-            String fileName = listOfFiles[i].getName();
-            if (listOfFiles[i].isFile() && fileName.endsWith(FILE_FORMAT_PROPERTY)) {
+        for (File listOfFile : listOfFiles) {
+            String fileName = listOfFile.getName();
+            if (listOfFile.isFile() && fileName.endsWith(FILE_FORMAT_PROPERTY)) {
                 try {
                     Properties prop = new Properties();
-                    prop.load(new FileReader(listOfFiles[i]));
+                    prop.load(new FileReader(listOfFile));
                     allPropertyMap.put(fileName.replace(FILE_FORMAT_PROPERTY, ""), prop);
                 } catch (IOException e) {
-                    throw new DictionaryReaderException("Property file not found at: " + listOfFiles[i].getAbsolutePath());
+                    throw new DictionaryReaderException("Property file not found at: " + listOfFile.getAbsolutePath());
                 }
             }
         }
