@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,7 @@ public final class CcDictionaryService implements DictionaryService {
 
     private Map<String, List<String>> getMap(String rootWord, Properties prop) {
         Map<String, String> duplicateKeyMap = getValueMap(rootWord, prop);
-        Map<String, List<String>> keyValueMap = new TreeMap<>(treemapComparator(rootWord));
+        Map<String, List<String>> keyValueMap = new TreeMap<>(DictionaryUtil.treemapComparator(rootWord));
         duplicateKeyMap.entrySet().forEach(set -> {
             String key = set.getKey();
             if (key.matches(DUPLICATE_KEY_PATTERN)) {
@@ -124,21 +123,6 @@ public final class CcDictionaryService implements DictionaryService {
 
     public static String getDictionaryDataPath() {
         return dictionaryDataPath;
-    }
-
-    private Comparator<String> treemapComparator(String rootWord) {
-        return (o1, o2) -> {
-            if (o1.equalsIgnoreCase(o2)) {
-                return 0;
-            }
-            if (o1.equalsIgnoreCase(rootWord)) {
-                return -1;
-            }
-            if (o2.equalsIgnoreCase(rootWord)) {
-                return 1;
-            }
-            return o1.compareTo(o2);
-        };
     }
 
     private static Properties loadProperyFile(String letter) {

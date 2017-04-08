@@ -22,11 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+
+import static java.util.Collections.singletonList;
 
 public final class WordnetDictionaryService implements DictionaryService {
 
-    public static final String EN_EN = "en-en";
-    private static URL url;
+    private static final String EN_EN = "en-en";
+    private static URL            url;
     private static IDictionary    dict;
     private static WordnetStemmer wordnetStemmer;
 
@@ -75,7 +78,7 @@ public final class WordnetDictionaryService implements DictionaryService {
     }
 
     private Map<String, List<String>> retrieveDefiniton(String word) {
-        Map<String, List<String>> definitionMap = new HashMap<>();
+        Map<String, List<String>> definitionMap = new TreeMap<>(DictionaryUtil.treemapComparator(word));
         Arrays.stream(POS.values()).forEach(wordType -> {
             List<String> stemWords = wordnetStemmer.findStems(word, wordType);
             stemWords.forEach(stemWord -> {
@@ -103,7 +106,7 @@ public final class WordnetDictionaryService implements DictionaryService {
 
                             List<String> list = definitionMap.get(root);
                             if (list == null) {
-                                definitionMap.put(root, new ArrayList<>(Arrays.asList(stringBuilder.toString())));
+                                definitionMap.put(root, new ArrayList<>(singletonList(stringBuilder.toString())));
                             } else {
                                 list.add(stringBuilder.toString());
                             }
@@ -133,8 +136,10 @@ public final class WordnetDictionaryService implements DictionaryService {
 
         public static String getByName(String name) {
             Optional<String> aliasz = Arrays.stream(WordTypeAlias.values())
-                                            .filter(w -> w.name.equals(name)).findFirst().map(WordTypeAlias::getAlias);
-            return aliasz.get();
+                                            .filter(w -> w.name.equals(name))
+                                            .findFirst()
+                                            .map(WordTypeAlias::getAlias);
+            return aliasz.orElseGet(null);
         }
 
         public String getAlias() {
