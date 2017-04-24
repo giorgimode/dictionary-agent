@@ -52,29 +52,32 @@ public final class CcDictionaryService implements DictionaryService {
         return finalMap;
     }
 
-    public static CcDictionaryService getInstance(LanguageEnum language) {
+    @SuppressWarnings("WeakerAccess")
+    public static CcDictionaryService getInstance(LanguageEnum lang, String path) {
+        dictionaryDataPath = path;
+        language = lang;
         return new CcDictionaryService(language);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static CcDictionaryService getInMemoryInstance(LanguageEnum lang, String path) {
         dictionaryDataPath = path;
         language = lang;
         allProperties = loadAllProperties();
-        return new CcDictionaryService(language);
+        return new CcDictionaryService(lang);
     }
 
     private Map<String, List<String>> getMap(String rootWord, Properties prop) {
         Map<String, String> duplicateKeyMap = getValueMap(rootWord, prop);
         Map<String, List<String>> keyValueMap = new TreeMap<>(DictionaryUtil.treemapComparator(rootWord));
-        duplicateKeyMap.entrySet().forEach(set -> {
-            String key = set.getKey();
+        duplicateKeyMap.forEach((key, value) -> {
             if (key.matches(DUPLICATE_KEY_PATTERN)) {
                 key = key.replaceAll(DUPLICATE_KEY_COUNTER_PATTERN, "");
             }
             if (keyValueMap.containsKey(key)) {
-                keyValueMap.get(key).add(set.getValue());
+                keyValueMap.get(key).add(value);
             } else {
-                keyValueMap.put(key, new ArrayList<>(Collections.singletonList(set.getValue())));
+                keyValueMap.put(key, new ArrayList<>(Collections.singletonList(value)));
             }
         });
         return keyValueMap;
@@ -121,10 +124,6 @@ public final class CcDictionaryService implements DictionaryService {
                   }
               });
         return propertiesMap;
-    }
-
-    public static String getDictionaryDataPath() {
-        return dictionaryDataPath;
     }
 
     private static Properties loadProperyFile(String letter) {
