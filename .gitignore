@@ -7,8 +7,9 @@ log/
 
 # User-specific stuff:
 
-.idea/
+.idea/*
 
 lib/
 *.log
 *.dat
+*.iml

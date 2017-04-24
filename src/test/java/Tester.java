@@ -5,6 +5,7 @@ import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
 import edu.mit.jwi.morph.WordnetStemmer;
+import org.junit.Ignore;
 
 import static edu.mit.jwi.item.POS.NOUN;
 
@@ -20,6 +21,7 @@ import static jdk.nashorn.internal.runtime.regexp.joni.constants.StackType.POS;
 /**
  * Created by modeg on 9/10/2016.
  */
+@Ignore
 public class Tester {
 
      public static void main (String[] args) {

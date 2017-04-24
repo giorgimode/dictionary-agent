@@ -1,9 +1,12 @@
+import org.junit.Ignore;
+
 import java.io.File;
 import java.util.TreeMap;
 
 /**
  * Created by modeg on 10/30/2016.
  */
+@Ignore
 public class Tester3 {
     public static void main(String[] args) {
         StringBuilder builder = new StringBuilder();

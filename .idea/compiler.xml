@@ -7,10 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="dictionary-agent" />
         <module name="Dictionary-parser" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="dictionary-agent" target="1.8" />
       <module name="Dictionary-parser" target="1.8" />
     </bytecodeTargetLevel>
   </component>
