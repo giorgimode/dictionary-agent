@@ -1,4 +1,4 @@
-package com.giorgimode.dictionary.impl;
+package com.giorgimode.dictionary;
 
 /**
  * Created by modeg on 10/30/2016.

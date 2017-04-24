@@ -1,5 +1,6 @@
 package com.giorgimode.dictionary.impl;
 
+import com.giorgimode.dictionary.DictionaryUtil;
 import com.giorgimode.dictionary.api.DictionaryService;
 import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.exception.DictionaryReaderException;

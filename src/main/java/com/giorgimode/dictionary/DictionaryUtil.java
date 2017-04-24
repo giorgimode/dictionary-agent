@@ -1,4 +1,4 @@
-package com.giorgimode.dictionary.impl;
+package com.giorgimode.dictionary;
 
 import java.util.Comparator;
 

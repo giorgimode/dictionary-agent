@@ -1,5 +1,7 @@
 package com.giorgimode.dictionary.impl;
 
+import com.giorgimode.dictionary.DictionaryUtil;
+import com.giorgimode.dictionary.LanguageEnum;
 import com.giorgimode.dictionary.api.DictionaryService;
 import com.giorgimode.dictionary.exception.DictionaryReaderException;
 import com.giorgimode.dictionary.exception.InvalidDictionaryLineException;

@@ -1,5 +1,6 @@
 package com.giorgimode.dictionary.impl;
 
+import com.giorgimode.dictionary.LanguageEnum;
 import org.junit.Before;
 import org.junit.Test;
 
