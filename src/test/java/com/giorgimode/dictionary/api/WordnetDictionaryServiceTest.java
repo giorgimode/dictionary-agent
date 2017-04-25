@@ -8,59 +8,32 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 /**
  * Created by modeg on 9/11/2016.
  */
-@Ignore
+
 public class WordnetDictionaryServiceTest {
     private String DICT_PATH = ".\\src\\test\\resources\\";
 
     @Test
-    public void retrieveDefinitionsBothTest() throws Exception {
-        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
-
-        Map<String, Map<String, List<String>>> definitions = retrieveDefinitions(wordsToTranslate);
-        Map<String, Map<String, List<String>>> definitionsInMemory = retrieveDefinitionsInMemory(wordsToTranslate);
-        //  definitions.entrySet().forEach(d -> System.out.println(d + "\n"));
-    }
-
-    @Test
     public void retrieveDefinitionsTest() throws Exception {
-        //  String[] wordsToTranslate = new String[]{"breaking"};
-        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
+        String[] wordsToTranslate = new String[]{"letters"};
         Map<String, Map<String, List<String>>> definitions = retrieveDefinitions(wordsToTranslate);
-        definitions.entrySet().forEach(map -> {
-            map.getValue().entrySet().forEach(list -> {
-                System.out.println(list.getKey() + ": ");
-                list.getValue().forEach(word -> System.out.println(word));
-            });
-        });
+        assertResults(definitions);
     }
 
     @Test
     public void retrieveDefinitionsInMemoryTest() throws Exception {
-        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
+        String[] wordsToTranslate = new String[]{"letters"};
         Map<String, Map<String, List<String>>> definitions = retrieveDefinitionsInMemory(wordsToTranslate);
-    }
-
-    private Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {
-        WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInstance(DICT_PATH);
-        long start = System.currentTimeMillis();
-        Map<String, Map<String, List<String>>> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
-        long timespent = System.currentTimeMillis() - start;
-        System.out.println("TIME FOR GETTING DEFINITIONS:\n" + timespent);
-
-        return definitions;
-    }
-
-    private Map<String, Map<String, List<String>>> retrieveDefinitionsInMemory(String[] wordsToTranslate) {
-        WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInMemoryInstance(ILoadPolicy.IMMEDIATE_LOAD, DICT_PATH);
-        long start = System.currentTimeMillis();
-        Map<String, Map<String, List<String>>> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
-        long timespent = System.currentTimeMillis() - start;
-        System.out.println("TIME FOR GETTING DEFINITIONS IN_MEMORY:\n" + timespent);
-
-        return definitions;
+        assertResults(definitions);
     }
 
     @Test
@@ -68,10 +41,37 @@ public class WordnetDictionaryServiceTest {
         String[] wordsToTranslate = new String[]{"letters"};
         WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInMemoryInstance(ILoadPolicy.NO_LOAD, DICT_PATH);
         wordnetDictionary.loadInMemoryDictionary();
-        long start = System.currentTimeMillis();
         Map<String, Map<String, List<String>>> definitions = wordnetDictionary.retrieveDefinitions(wordsToTranslate);
-        long timespent = System.currentTimeMillis() - start;
-        System.out.println("TIME FOR GETTING DEFINITIONS IN_MEMORY:\n" + timespent);
+        assertResults(definitions);
     }
 
+    private void assertResults(Map<String, Map<String, List<String>>> definitions) {
+        Map<String, List<String>> letters = definitions.get("letters");
+        assertNotNull(letters);
+        assertThat(letters, is(notNullValue()));
+        assertThat(letters.size(), is(2));
+        assertThat(letters.get("letters"), hasItems("(n.) the literary culture; \"this book shows American letters at its best\"",
+                "(n.) scholarly attainment; \"he is a man of letters\""));
+        assertThat(letters.get("letter").size(), is(8));
+        assertThat(letters.get("letter"), hasItem(
+                "(n.) a written message addressed to a person or organization; \"mailed an indignant letter to the editor\""));
+    }
+
+    @Test
+    @Ignore
+    @SuppressWarnings("all")
+    public void retrieveDefinitionsTest0() throws Exception {
+        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
+        Map<String, Map<String, List<String>>> definitions = retrieveDefinitions(wordsToTranslate);
+    }
+
+    private Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {
+        WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInstance(DICT_PATH);
+        return wordnetDictionary.retrieveDefinitions(wordsToTranslate);
+    }
+
+    private Map<String, Map<String, List<String>>> retrieveDefinitionsInMemory(String[] wordsToTranslate) {
+        WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getImmediateInMemoryInstance(DICT_PATH);
+        return wordnetDictionary.retrieveDefinitions(wordsToTranslate);
+    }
 }

@@ -1,7 +1,7 @@
-package com.giorgimode.dictionary.impl;
+package com.giorgimode.dictionary.api;
 
 import com.giorgimode.dictionary.LanguageEnum;
-import com.giorgimode.dictionary.api.DictionaryService;
+import com.giorgimode.dictionary.impl.CcDictionaryService;
 import org.junit.Test;
 
 import java.util.Arrays;

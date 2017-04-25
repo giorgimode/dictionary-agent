@@ -31,10 +31,7 @@ public final class CcDictionaryService implements DictionaryService {
     private static LanguageEnum            language;
     private static Map<String, Properties> allProperties;
 
-    private CcDictionaryService(LanguageEnum language) {
-        if (CcDictionaryService.language == null) {
-            CcDictionaryService.language = language;
-        }
+    private CcDictionaryService() {
     }
 
     @Override
@@ -56,7 +53,7 @@ public final class CcDictionaryService implements DictionaryService {
     public static CcDictionaryService getInstance(LanguageEnum lang, String path) {
         dictionaryDataPath = path;
         language = lang;
-        return new CcDictionaryService(language);
+        return new CcDictionaryService();
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -64,7 +61,7 @@ public final class CcDictionaryService implements DictionaryService {
         dictionaryDataPath = path;
         language = lang;
         allProperties = loadAllProperties();
-        return new CcDictionaryService(lang);
+        return new CcDictionaryService();
     }
 
     private Map<String, List<String>> getMap(String rootWord, Properties prop) {

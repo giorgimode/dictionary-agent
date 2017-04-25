@@ -8,6 +8,7 @@ import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.IRAMDictionary;
 import edu.mit.jwi.RAMDictionary;
+import edu.mit.jwi.data.ILoadPolicy;
 import edu.mit.jwi.item.IIndexWord;
 import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
@@ -59,6 +60,10 @@ public final class WordnetDictionaryService implements DictionaryService {
 
     public static WordnetDictionaryService getInMemoryInstance(int loadPolicy, String path) {
         return new WordnetDictionaryService(loadPolicy, path);
+    }
+
+    public static WordnetDictionaryService getImmediateInMemoryInstance(String path) {
+        return new WordnetDictionaryService(ILoadPolicy.IMMEDIATE_LOAD, path);
     }
 
     public void loadInMemoryDictionary() {
@@ -147,6 +152,7 @@ public final class WordnetDictionaryService implements DictionaryService {
             return alias;
         }
 
+        @SuppressWarnings("unused")
         public String getName() {
             return name;
         }
