@@ -17,6 +17,7 @@ public class DictionaryException extends RuntimeException {
     /**
      * @param message the exception message
      */
+    @SuppressWarnings("WeakerAccess")
     public DictionaryException(String message) {
         super(message);
     }
@@ -24,6 +25,7 @@ public class DictionaryException extends RuntimeException {
     /**
      * @param cause the cause
      */
+    @SuppressWarnings("WeakerAccess")
     public DictionaryException(Throwable cause) {
         super(cause);
     }

@@ -1,8 +1,8 @@
 package com.giorgimode.dictionary.api;
 
+import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.impl.WordnetDictionaryService;
 import edu.mit.jwi.data.ILoadPolicy;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -57,12 +57,14 @@ public class WordnetDictionaryServiceTest {
                 "(n.) a written message addressed to a person or organization; \"mailed an indignant letter to the editor\""));
     }
 
-    @Test
-    @Ignore
-    @SuppressWarnings("all")
-    public void retrieveDefinitionsTest0() throws Exception {
-        String[] wordsToTranslate = new String[]{"letters", "books", "driving", "take", "let"};
-        Map<String, Map<String, List<String>>> definitions = retrieveDefinitions(wordsToTranslate);
+    @Test(expected = DictionaryException.class)
+    public void wrongPathInMemoryTest() throws Exception {
+        WordnetDictionaryService.getImmediateInMemoryInstance("wrong path");
+    }
+
+    @Test(expected = DictionaryException.class)
+    public void wrongPathTest() throws Exception {
+        WordnetDictionaryService.getInstance("wrong path");
     }
 
     private Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {

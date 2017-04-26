@@ -3,6 +3,7 @@ package com.giorgimode.dictionary.exception;
 /**
  * An exception for an invalid dictionary format.
  */
+@SuppressWarnings("unused")
 public class InvalidDictionaryLineException extends DictionaryException {
     private static final long serialVersionUID = 1L;
 

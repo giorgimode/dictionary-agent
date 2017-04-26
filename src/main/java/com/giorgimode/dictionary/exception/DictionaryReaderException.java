@@ -24,6 +24,7 @@ public class DictionaryReaderException extends DictionaryException {
     /**
      * @param cause the cause
      */
+    @SuppressWarnings("unused")
     public DictionaryReaderException(Throwable cause) {
         super(cause);
     }

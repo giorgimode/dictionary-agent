@@ -14,6 +14,7 @@ import edu.mit.jwi.item.IWord;
 import edu.mit.jwi.item.IWordID;
 import edu.mit.jwi.item.POS;
 import edu.mit.jwi.morph.WordnetStemmer;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -28,6 +29,7 @@ import java.util.TreeMap;
 
 import static java.util.Collections.singletonList;
 
+@Slf4j
 public final class WordnetDictionaryService implements DictionaryService {
 
     private static final String EN_EN = "en-en";
@@ -39,6 +41,7 @@ public final class WordnetDictionaryService implements DictionaryService {
         try {
             url = new URL("file", null, path + EN_EN);
         } catch (MalformedURLException e) {
+            log.error("No dictionary data found at {}. {}", url, e);
             throw new DictionaryException("No dictionary data found at " + url, e);
         }
         if (loadPolicy != 0) {
@@ -49,7 +52,12 @@ public final class WordnetDictionaryService implements DictionaryService {
         try {
             dict.open();
         } catch (IOException e) {
+            log.error("Error opening dictionary. {}", e);
             throw new DictionaryReaderException("Error opening dictionary.", e);
+        }
+        if (!dict.isOpen()) {
+            log.error("Dictionary failed to open at path {}", path);
+            throw new DictionaryReaderException("Dictionary failed to open at path " + path);
         }
         wordnetStemmer = new WordnetStemmer(dict);
     }
@@ -74,6 +82,7 @@ public final class WordnetDictionaryService implements DictionaryService {
 
     @Override
     public Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {
+        log.debug("translating words {}", Arrays.toString(wordsToTranslate));
         Map<String, Map<String, List<String>>> definitons = new HashMap<>(wordsToTranslate.length);
         Arrays.stream(wordsToTranslate).forEach(wordToTranslate -> {
             if (wordToTranslate != null && wordToTranslate.length() > 2) {
