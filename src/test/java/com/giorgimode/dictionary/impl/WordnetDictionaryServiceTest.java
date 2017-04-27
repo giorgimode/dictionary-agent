@@ -1,7 +1,5 @@
 package com.giorgimode.dictionary.impl;
 
-import com.giorgimode.dictionary.exception.DictionaryException;
-import com.giorgimode.dictionary.impl.WordnetDictionaryService;
 import edu.mit.jwi.data.ILoadPolicy;
 import org.junit.Test;
 
@@ -14,6 +12,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by modeg on 9/11/2016.
@@ -30,14 +29,14 @@ public class WordnetDictionaryServiceTest {
     }
 
     @Test
-    public void retrieveDefinitionsInMemoryTest() throws Exception {
+    public void retrieveDefinitionsInMemoryTest() {
         String[] wordsToTranslate = new String[]{"letters"};
         Map<String, Map<String, List<String>>> definitions = retrieveDefinitionsInMemory(wordsToTranslate);
         assertResults(definitions);
     }
 
     @Test
-    public void retrieveDefinitionsInMemoryTest2() throws Exception {
+    public void retrieveDefinitionsInMemoryTest2() {
         String[] wordsToTranslate = new String[]{"letters"};
         WordnetDictionaryService wordnetDictionary = WordnetDictionaryService.getInMemoryInstance(ILoadPolicy.NO_LOAD, DICT_PATH);
         wordnetDictionary.loadInMemoryDictionary();
@@ -57,14 +56,18 @@ public class WordnetDictionaryServiceTest {
                 "(n.) a written message addressed to a person or organization; \"mailed an indignant letter to the editor\""));
     }
 
-    @Test(expected = DictionaryException.class)
-    public void wrongPathInMemoryTest() throws Exception {
-        WordnetDictionaryService.getImmediateInMemoryInstance("wrong path");
+    @Test
+    public void wrongPathInMemoryTest() {
+        WordnetDictionaryService dictionaryService = WordnetDictionaryService.getImmediateInMemoryInstance("wrong path");
+        Map<String, Map<String, List<String>>> definitions = dictionaryService.retrieveDefinitions(new String[]{"letters"});
+        assertTrue(definitions.isEmpty());
     }
 
-    @Test(expected = DictionaryException.class)
+    @Test
     public void wrongPathTest() throws Exception {
-        WordnetDictionaryService.getInstance("wrong path");
+        WordnetDictionaryService dictionaryService = WordnetDictionaryService.getInstance("wrong path");
+        Map<String, Map<String, List<String>>> definitions = dictionaryService.retrieveDefinitions(new String[]{"letters"});
+        assertTrue(definitions.isEmpty());
     }
 
     private Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {

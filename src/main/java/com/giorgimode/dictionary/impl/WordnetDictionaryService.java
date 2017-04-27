@@ -2,8 +2,6 @@ package com.giorgimode.dictionary.impl;
 
 import com.giorgimode.dictionary.DictionaryUtil;
 import com.giorgimode.dictionary.api.DictionaryService;
-import com.giorgimode.dictionary.exception.DictionaryException;
-import com.giorgimode.dictionary.exception.DictionaryReaderException;
 import edu.mit.jwi.Dictionary;
 import edu.mit.jwi.IDictionary;
 import edu.mit.jwi.IRAMDictionary;
@@ -21,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +32,21 @@ import static java.util.Collections.singletonList;
 public final class WordnetDictionaryService implements DictionaryService {
 
     private static final String EN_EN = "en-en";
-    private static URL            url;
-    private static IDictionary    dict;
-    private static WordnetStemmer wordnetStemmer;
+    private URL            url;
+    private IDictionary    dict;
+    private WordnetStemmer wordnetStemmer;
 
     private WordnetDictionaryService(int loadPolicy, String path) {
         log.debug("loading dictionary with load policy {} and from directory {}", loadPolicy, path);
+        init(loadPolicy, path);
+    }
+
+    private void init(int loadPolicy, String path) {
         try {
             url = new URL("file", null, path + EN_EN);
         } catch (MalformedURLException e) {
             log.error("No dictionary data found at {}. {}", url, e);
-            throw new DictionaryException("No dictionary data found at " + url, e);
+            return;
         }
         if (loadPolicy != 0) {
             dict = new RAMDictionary(url, loadPolicy);
@@ -54,11 +57,11 @@ public final class WordnetDictionaryService implements DictionaryService {
             dict.open();
         } catch (IOException e) {
             log.error("Error opening dictionary. {}", e);
-            throw new DictionaryReaderException("Error opening dictionary.", e);
+            return;
         }
         if (!dict.isOpen()) {
             log.error("Dictionary failed to open at path {}", path);
-            throw new DictionaryReaderException("Dictionary failed to open at path " + path);
+            return;
         }
         wordnetStemmer = new WordnetStemmer(dict);
     }
@@ -84,6 +87,10 @@ public final class WordnetDictionaryService implements DictionaryService {
     @Override
     public Map<String, Map<String, List<String>>> retrieveDefinitions(String[] wordsToTranslate) {
         log.debug("translating words {}", Arrays.toString(wordsToTranslate));
+        if (!isLoaded()) {
+            log.debug("dictionary is not loaded properly");
+            return Collections.emptyMap();
+        }
         Map<String, Map<String, List<String>>> definitons = new HashMap<>(wordsToTranslate.length);
         Arrays.stream(wordsToTranslate).forEach(wordToTranslate -> {
             if (wordToTranslate != null && wordToTranslate.length() > 2) {
@@ -133,6 +140,10 @@ public final class WordnetDictionaryService implements DictionaryService {
         });
 
         return definitionMap;
+    }
+
+    private boolean isLoaded() {
+        return wordnetStemmer != null;
     }
 
     private enum WordTypeAlias {
