@@ -1,7 +1,7 @@
-package com.giorgimode.dictionary.api;
+package com.giorgimode.dictionary.impl;
 
 import com.giorgimode.dictionary.LanguageEnum;
-import com.giorgimode.dictionary.impl.CcDictionaryService;
+import com.giorgimode.dictionary.api.DictionaryService;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -59,6 +59,20 @@ public class CcDictionaryServiceTest {
     public void retrieveDefinitions4() throws Exception {
         CcDictionaryService ccDictionaryService = CcDictionaryService.getInstance(LanguageEnum.EN_DE, PATH);
         assertDefinitions(ccDictionaryService);
+    }
+
+    @Test
+    public void retrieveDefinitions_wrong() throws Exception {
+        CcDictionaryService dictionaryService = CcDictionaryService.getInstance(LanguageEnum.EN_DE, "wrong");
+        Map<String, Map<String, List<String>>> definitions = dictionaryService.retrieveDefinitions(new String[]{"book", "tree"});
+        assertTrue(definitions.isEmpty());
+    }
+
+    @Test
+    public void retrieveDefinitions_wrong2() throws Exception {
+        CcDictionaryService dictionaryService = CcDictionaryService.getInMemoryInstance(LanguageEnum.EN_DE, "wrong");
+        Map<String, Map<String, List<String>>> definitions = dictionaryService.retrieveDefinitions(new String[]{"book", "tree"});
+        assertTrue(definitions.isEmpty());
     }
 
     private void assertDefinitions(DictionaryService dictionaryService) {

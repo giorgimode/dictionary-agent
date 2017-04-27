@@ -1,4 +1,4 @@
-package com.giorgimode.dictionary.api;
+package com.giorgimode.dictionary.impl;
 
 import com.giorgimode.dictionary.exception.DictionaryException;
 import com.giorgimode.dictionary.impl.WordnetDictionaryService;

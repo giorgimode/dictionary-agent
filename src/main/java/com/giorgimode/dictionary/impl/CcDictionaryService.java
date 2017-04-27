@@ -3,8 +3,7 @@ package com.giorgimode.dictionary.impl;
 import com.giorgimode.dictionary.DictionaryUtil;
 import com.giorgimode.dictionary.LanguageEnum;
 import com.giorgimode.dictionary.api.DictionaryService;
-import com.giorgimode.dictionary.exception.DictionaryReaderException;
-import com.giorgimode.dictionary.exception.InvalidDictionaryLineException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileReader;
@@ -18,9 +17,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
+import static java.util.Arrays.asList;
+
 /**
  * Created by modeg on 10/30/2016.
  */
+@Slf4j
 public final class CcDictionaryService implements DictionaryService {
     private static String dictionaryDataPath;
     private static final String KEY_VALUE_SPLIT               = "-->";
@@ -36,6 +38,7 @@ public final class CcDictionaryService implements DictionaryService {
 
     @Override
     public Map<String, Map<String, List<String>>> retrieveDefinitions(String[] words) {
+        log.debug("retrieving definitions for words: {}", asList(words).toArray());
         Map<String, Properties> propertiesMap = getProperties(words);
         Map<String, Map<String, List<String>>> finalMap = new LinkedHashMap<>(words.length);
         for (String rootWord : words) {
@@ -51,6 +54,7 @@ public final class CcDictionaryService implements DictionaryService {
 
     @SuppressWarnings("WeakerAccess")
     public static CcDictionaryService getInstance(LanguageEnum lang, String path) {
+        log.debug("loading CcDictionaryService with language {} on path {}", lang.name(), path);
         dictionaryDataPath = path;
         language = lang;
         return new CcDictionaryService();
@@ -58,6 +62,7 @@ public final class CcDictionaryService implements DictionaryService {
 
     @SuppressWarnings("WeakerAccess")
     public static CcDictionaryService getInMemoryInstance(LanguageEnum lang, String path) {
+        log.debug("loading InMemory CcDictionaryService with language {} on path {}", lang.name(), path);
         dictionaryDataPath = path;
         language = lang;
         allProperties = loadAllProperties();
@@ -96,10 +101,10 @@ public final class CcDictionaryService implements DictionaryService {
             // valueAndDefinition: [Autositzbezüge {pl}], [auto seat covers noun]
             String[] valueAndDefinition = definition.split(KEY_VALUE_SPLIT);
             if (valueAndDefinition.length > 0 && valueAndDefinition.length != 2) {
-                throw new InvalidDictionaryLineException("Invalid formatting on line: " + definition);
+                log.error("Invalid formatting on line: {}", definition);
+                continue;
             }
             valueMap.put(valueAndDefinition[0], valueAndDefinition[1]);
-
         }
 
         return valueMap;
@@ -116,7 +121,7 @@ public final class CcDictionaryService implements DictionaryService {
               .filter(letter -> !propertiesMap.containsKey(letter))
               .forEach(letter -> {
                   Properties prop = loadProperyFile(letter);
-                  if (!prop.isEmpty()) {
+                  if (prop != null && !prop.isEmpty()) {
                       propertiesMap.put(letter, prop);
                   }
               });
@@ -129,7 +134,8 @@ public final class CcDictionaryService implements DictionaryService {
         try {
             prop.load(new FileReader(propertyPath));
         } catch (IOException e) {
-            throw new DictionaryReaderException("Property file not found at: " + propertyPath);
+            log.error("Property file not found at: {}", propertyPath);
+            return null;
         }
         return prop;
     }
@@ -140,7 +146,8 @@ public final class CcDictionaryService implements DictionaryService {
         File folder = new File(propertyDirectoryPath);
         File[] listOfFiles = folder.listFiles();
         if (listOfFiles == null) {
-            throw new DictionaryReaderException("Property files not found at: " + folder.getAbsolutePath());
+            log.error("Property files not found at: {}", folder.getAbsolutePath());
+            return Collections.emptyMap();
         }
         for (File listOfFile : listOfFiles) {
             String fileName = listOfFile.getName();
@@ -150,7 +157,7 @@ public final class CcDictionaryService implements DictionaryService {
                     prop.load(new FileReader(listOfFile));
                     allPropertyMap.put(fileName.replace(FILE_FORMAT_PROPERTY, ""), prop);
                 } catch (IOException e) {
-                    throw new DictionaryReaderException("Property file not found at: " + listOfFile.getAbsolutePath());
+                    log.error("Property file not found at: {}", listOfFile.getAbsolutePath());
                 }
             }
         }

@@ -38,6 +38,7 @@ public final class WordnetDictionaryService implements DictionaryService {
     private static WordnetStemmer wordnetStemmer;
 
     private WordnetDictionaryService(int loadPolicy, String path) {
+        log.debug("loading dictionary with load policy {} and from directory {}", loadPolicy, path);
         try {
             url = new URL("file", null, path + EN_EN);
         } catch (MalformedURLException e) {
@@ -125,7 +126,6 @@ public final class WordnetDictionaryService implements DictionaryService {
                             } else {
                                 list.add(stringBuilder.toString());
                             }
-
                         }
                     });
                 }
