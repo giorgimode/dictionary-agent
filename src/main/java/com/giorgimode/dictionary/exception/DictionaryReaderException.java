@@ -3,6 +3,7 @@ package com.giorgimode.dictionary.exception;
 /**
  * An exception while reading a dictionary file.
  */
+@SuppressWarnings("unused")
 public class DictionaryReaderException extends DictionaryException {
     private static final long serialVersionUID = 1L;
 
@@ -24,7 +25,6 @@ public class DictionaryReaderException extends DictionaryException {
     /**
      * @param cause the cause
      */
-    @SuppressWarnings("unused")
     public DictionaryReaderException(Throwable cause) {
         super(cause);
     }

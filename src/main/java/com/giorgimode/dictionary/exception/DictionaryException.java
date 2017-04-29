@@ -3,6 +3,7 @@ package com.giorgimode.dictionary.exception;
 /**
  * Any exceptions related to dictionary.
  */
+@SuppressWarnings("WeakerAccess")
 public class DictionaryException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
@@ -17,7 +18,6 @@ public class DictionaryException extends RuntimeException {
     /**
      * @param message the exception message
      */
-    @SuppressWarnings("WeakerAccess")
     public DictionaryException(String message) {
         super(message);
     }
@@ -25,7 +25,6 @@ public class DictionaryException extends RuntimeException {
     /**
      * @param cause the cause
      */
-    @SuppressWarnings("WeakerAccess")
     public DictionaryException(Throwable cause) {
         super(cause);
     }

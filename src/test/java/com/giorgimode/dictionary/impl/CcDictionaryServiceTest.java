@@ -4,12 +4,13 @@ import com.giorgimode.dictionary.LanguageEnum;
 import com.giorgimode.dictionary.api.DictionaryService;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -82,8 +83,8 @@ public class CcDictionaryServiceTest {
         Map<String, List<String>> rootWord = definitions.get("cab");
         assertNotNull(rootWord);
         assertEquals(rootWord.get("cab").size(), 4);
-        assertTrue(rootWord.get("cab").containsAll(Arrays
-                .asList("(noun) Cab {n}", "(noun) Droschke {f}", "(noun) Fiaker {m} [österr.]", "(noun) Taxi {n} [schweiz. auch: {m}]")));
+        assertThat(rootWord.get("cab"), contains("(noun) Cab {n}", "(noun) Droschke {f}", "(noun) Fiaker {m} [österr.]",
+                "(noun) Taxi {n} [schweiz. auch: {m}]"));
         assertEquals(rootWord.get("cab [driver's cab]").size(), 1);
         assertTrue(rootWord.get("cab [driver's cab]").contains("(noun) Führerhaus {n}"));
 
