@@ -70,6 +70,8 @@ public final class CcDictionaryService implements DictionaryService {
     }
 
     private Map<String, List<String>> getMap(String rootWord, Properties prop) {
+        // entries with multiple definitions in the file have keys appended with ~1~, ~2~ etc., therefore
+        // duplicateKeyMap contains keys in a following way: book~1~, book~2~... These entries need to be merged
         Map<String, String> duplicateKeyMap = getValueMap(rootWord, prop);
         Map<String, List<String>> keyValueMap = new TreeMap<>(DictionaryUtil.treemapComparator(rootWord));
         duplicateKeyMap.forEach((key, value) -> {
@@ -87,7 +89,6 @@ public final class CcDictionaryService implements DictionaryService {
 
     private Map<String, String> getValueMap(String rootWord, Properties prop) {
         // line:  autositzbezüge=Autositzbezüge {pl}-->auto seat covers noun && Autositzbezüge {pl}(1)-->car seat covers noun &&
-
         // property value: Autositzbezüge {pl}-->auto seat covers noun && Autositzbezüge {pl}(1)-->car seat covers noun
         Object propertyValueObject = prop.get(rootWord);
         if (propertyValueObject == null) {
